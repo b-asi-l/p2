@@ -7,6 +7,7 @@ export enum VehicleType {
 export enum TripStatus {
   OPEN = 'OPEN',
   FULL = 'FULL',
+  STARTED = 'STARTED',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED'
 }
@@ -17,6 +18,14 @@ export enum RequestStatus {
   REJECTED = 'REJECTED'
 }
 
+export interface Transaction {
+  id: string;
+  type: 'CREDIT' | 'DEBIT';
+  amount: number;
+  description: string;
+  timestamp: number;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -24,6 +33,8 @@ export interface User {
   vehicle?: string;
   rating: number;
   tripsCount: number;
+  balance: number;
+  transactions: Transaction[];
 }
 
 export interface JoinRequest {
@@ -37,11 +48,23 @@ export interface JoinRequest {
   timestamp: number;
 }
 
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'INFO' | 'SUCCESS' | 'WARNING';
+  isRead: boolean;
+  timestamp: number;
+}
+
 export interface Trip {
   id: string;
   ownerId: string;
   ownerName: string;
   ownerAvatar: string;
+  ownerRating: number;
+  ownerTripsCount: number;
   from: string;
   to: string;
   date: string;
@@ -56,4 +79,4 @@ export interface Trip {
   requests: JoinRequest[];
 }
 
-export type ViewState = 'HOME' | 'SEARCH' | 'POST' | 'MY_TRIPS' | 'PROFILE';
+export type ViewState = 'HOME' | 'SEARCH' | 'POST' | 'MY_TRIPS' | 'PROFILE' | 'NOTIFICATIONS' | 'WALLET' | 'LIVE_TRACKING';
