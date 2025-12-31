@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   ViewState, 
@@ -19,39 +18,45 @@ import {
   getLiveCopilotUpdate 
 } from './services/geminiService';
 
-// --- Comprehensive Kerala Location Database ---
-const KERALA_LOCATIONS = [
-  // Kochi / Ernakulam
-  "Infopark, Kochi", "Technopark, Trivandrum", "SmartCity, Kochi", "Vyttila Hub, Kochi", 
-  "Kakkanad, Kochi", "Edappally, Kochi", "Marine Drive, Kochi", "Lulu Mall, Kochi",
-  "Aluva Metro Station", "Fort Kochi", "Cherai Beach", "Panampilly Nagar, Kochi",
-  "Kalamassery, Kochi", "Nedumbassery (Airport)", "Angamaly, Kochi",
-  // Trivandrum
-  "East Fort, Trivandrum", "Kazhakkoottam, Trivandrum", "Kowdiar, Trivandrum", 
-  "Vizhinjam, Trivandrum", "Pattom, Trivandrum", "Statue, Trivandrum",
-  "Technocity, Pallippuram", "Varkala Cliff", "Neyyattinkara",
-  // Kozhikode
-  "Hilite Mall, Kozhikode", "Mananchira Square, Kozhikode", "Beach Road, Kozhikode",
-  "Pantheerankavu, Kozhikode", "Thamarassery, Kozhikode", "Ramanattukara",
-  // Thrissur
-  "Swaraj Round, Thrissur", "Guruvayur Temple", "Chavakkad, Thrissur", 
-  "Wadakkanchery", "Kodungallur", "Athirappilly Falls",
-  // Other Districts
-  "Munnar, Idukki", "Thodupuzha, Idukki", "Adimali, Idukki", "Thekkady, Idukki",
-  "Wayanad (Kalpetta)", "Sulthan Bathery, Wayanad", "Mananthavady, Wayanad",
-  "Baker Junction, Kottayam", "Kumarakom, Kottayam", "Pala, Kottayam", "Changanassery",
-  "Alappuzha Beach", "Kuttanad, Alappuzha", "Cherthala, Alappuzha", "Kayamkulam",
-  "Ashtamudi, Kollam", "Chinnakada, Kollam", "Karunagappally, Kollam", "Beach Road, Kollam",
-  "Palakkad Town", "Ottapalam, Palakkad", "Mannarkkad, Palakkad",
-  "Manjeri, Malappuram", "Tirur, Malappuram", "Perinthalmanna, Malappuram",
-  "Thalassery, Kannur", "Payyannur, Kannur", "Kannur Town",
-  "Kanhangad, Kasaragod", "Kasaragod Town", "Nilambur, Malappuram",
-  "Adoor, Pathanamthitta", "Thiruvalla, Pathanamthitta", "Sabari Hills"
+// --- Categorized Kerala Location Database for Smarter Recommendations ---
+const KERALA_HUBS = [
+  { name: "Infopark, Kochi", district: "Ernakulam", type: "IT HUB", popular: true },
+  { name: "Technopark, Trivandrum", district: "Trivandrum", type: "IT HUB", popular: true },
+  { name: "SmartCity, Kochi", district: "Ernakulam", type: "IT HUB", popular: false },
+  { name: "Vyttila Hub, Kochi", district: "Ernakulam", type: "TRANSIT", popular: true },
+  { name: "Lulu Mall, Kochi", district: "Ernakulam", type: "HUB", popular: true },
+  { name: "Edappally, Kochi", district: "Ernakulam", type: "HUB", popular: true },
+  { name: "Kakkanad, Kochi", district: "Ernakulam", type: "HUB", popular: true },
+  { name: "Marine Drive, Kochi", district: "Ernakulam", type: "HUB", popular: false },
+  { name: "Aluva Metro Station", district: "Ernakulam", type: "TRANSIT", popular: true },
+  { name: "East Fort, Trivandrum", district: "Trivandrum", type: "TRANSIT", popular: true },
+  { name: "Kazhakkoottam, Trivandrum", district: "Trivandrum", type: "HUB", popular: true },
+  { name: "Hilite Mall, Kozhikode", district: "Kozhikode", type: "HUB", popular: true },
+  { name: "Mananchira Square", district: "Kozhikode", type: "HUB", popular: false },
+  { name: "Swaraj Round, Thrissur", district: "Thrissur", type: "HUB", popular: true },
+  { name: "Guruvayur Temple", district: "Thrissur", type: "PILGRIM", popular: false },
+  { name: "Munnar Town", district: "Idukki", type: "TOURISM", popular: true },
+  { name: "Wayanad (Kalpetta)", district: "Wayanad", type: "TOURISM", popular: true },
+  { name: "Alappuzha Beach", district: "Alappuzha", type: "TOURISM", popular: false },
+  { name: "Baker Junction", district: "Kottayam", type: "HUB", popular: false },
+  { name: "Chinnakada, Kollam", district: "Kollam", type: "HUB", popular: false },
+  { name: "Thalassery", district: "Kannur", type: "HUB", popular: false },
+  { name: "Palakkad Town", district: "Palakkad", type: "HUB", popular: false }
+];
+
+// Popular route pairs for quick selection
+const POPULAR_KERALA_ROUTES = [
+  { from: "Infopark, Kochi", to: "Thrissur" },
+  { from: "Technopark, Trivandrum", to: "Kollam" },
+  { from: "Kakkanad, Kochi", to: "Aluva" },
+  { from: "Lulu Mall, Kochi", to: "Munnar" },
+  { from: "Kozhikode", to: "Wayanad" }
 ];
 
 // --- Helper Components ---
 
-const Badge = ({ children, color = 'indigo' }: { children: React.ReactNode, color?: string }) => {
+// Fix: Making children optional to handle cases where TS compiler might miss them in JSX prop extraction
+const Badge = ({ children, color = 'indigo' }: { children?: React.ReactNode, color?: string }) => {
   const colors: Record<string, string> = {
     indigo: 'bg-indigo-50 text-indigo-700 border-indigo-100',
     green: 'bg-green-50 text-green-700 border-green-100',
@@ -60,14 +65,14 @@ const Badge = ({ children, color = 'indigo' }: { children: React.ReactNode, colo
     slate: 'bg-slate-50 text-slate-600 border-slate-100',
   };
   return (
-    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${colors[color]}`}>
+    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${colors[color] || colors.indigo}`}>
       {children}
     </span>
   );
 };
 
 /**
- * Enhanced Location Input with Autocomplete & Keyboard Support
+ * Enhanced Location Input with Recommendation Groups
  */
 const LocationInput = ({ 
   value, 
@@ -89,20 +94,26 @@ const LocationInput = ({
   const suggestionRef = useRef<HTMLDivElement>(null);
 
   const suggestions = useMemo(() => {
-    if (!value || value.length < 1) return [];
     const query = value.toLowerCase();
     
-    // Logic: Starts with gets priority, then includes
-    const filtered = KERALA_LOCATIONS.filter(loc => 
-      loc.toLowerCase().includes(query)
+    // If empty, show popular hubs
+    if (!query) {
+      return KERALA_HUBS.filter(h => h.popular).slice(0, 5);
+    }
+
+    // Otherwise filter based on input
+    const filtered = KERALA_HUBS.filter(loc => 
+      loc.name.toLowerCase().includes(query) || 
+      loc.district.toLowerCase().includes(query) ||
+      loc.type.toLowerCase().includes(query)
     );
 
     return filtered.sort((a, b) => {
-      const aStarts = a.toLowerCase().startsWith(query);
-      const bStarts = b.toLowerCase().startsWith(query);
+      const aStarts = a.name.toLowerCase().startsWith(query);
+      const bStarts = b.name.toLowerCase().startsWith(query);
       if (aStarts && !bStarts) return -1;
       if (!aStarts && bStarts) return 1;
-      return a.localeCompare(b);
+      return a.name.localeCompare(b.name);
     }).slice(0, 6);
   }, [value]);
 
@@ -117,7 +128,7 @@ const LocationInput = ({
       setSelectedIndex(prev => (prev > 0 ? prev - 1 : 0));
     } else if (e.key === 'Enter' && selectedIndex >= 0) {
       e.preventDefault();
-      onChange(suggestions[selectedIndex]);
+      onChange(suggestions[selectedIndex].name);
       setShowSuggestions(false);
     } else if (e.key === 'Escape') {
       setShowSuggestions(false);
@@ -156,27 +167,40 @@ const LocationInput = ({
           className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl border-2 border-indigo-50 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-300"
         >
           <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-2">Kerala Locations</p>
-            <span className="text-[8px] font-bold text-slate-300 uppercase">Use Arrows to Navigate</span>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-2">
+              {value ? 'Matching Hubs' : 'Recommended Start Points'}
+            </p>
           </div>
-          <div className="max-h-[300px] overflow-y-auto custom-scroll">
+          <div className="max-h-[350px] overflow-y-auto custom-scroll">
             {suggestions.map((loc, idx) => (
               <button
                 key={idx}
                 type="button"
                 onMouseEnter={() => setSelectedIndex(idx)}
                 onMouseDown={() => {
-                  onChange(loc);
+                  onChange(loc.name);
                   setShowSuggestions(false);
                 }}
-                className={`w-full text-left px-6 py-5 transition-all flex items-center gap-4 border-b border-slate-50 last:border-0 ${
-                  selectedIndex === idx ? 'bg-indigo-600 text-white pl-10' : 'hover:bg-indigo-50 text-slate-800'
+                className={`w-full text-left px-6 py-4 transition-all flex items-center justify-between border-b border-slate-50 last:border-0 ${
+                  selectedIndex === idx ? 'bg-indigo-600 text-white' : 'hover:bg-indigo-50 text-slate-800'
                 }`}
               >
-                <div className={`${selectedIndex === idx ? 'text-white' : 'text-indigo-600'} transition-colors`}>
-                  <Icons.Location className="w-5 h-5" />
+                <div className="flex items-center gap-4">
+                  <div className={`${selectedIndex === idx ? 'text-white' : 'text-indigo-600'}`}>
+                    <Icons.Location className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black tracking-tight">{loc.name}</span>
+                    <span className={`text-[9px] font-bold uppercase tracking-widest ${selectedIndex === idx ? 'text-indigo-200' : 'text-slate-400'}`}>
+                      {loc.district} • {loc.type}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-base font-black tracking-tight">{loc}</span>
+                {loc.popular && !value && (
+                  <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${selectedIndex === idx ? 'bg-white/20 text-white' : 'bg-orange-100 text-orange-600'}`}>
+                    Trending
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -291,7 +315,7 @@ const TripCard: React.FC<{
     setIsRequesting(false);
   };
 
-  const statusColors = {
+  const statusColors: Record<string, string> = {
     [TripStatus.OPEN]: 'indigo',
     [TripStatus.FULL]: 'slate',
     [TripStatus.STARTED]: 'green',
@@ -320,6 +344,7 @@ const TripCard: React.FC<{
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
+          {/* Fix: Explicitly ensuring children are provided to the Badge component */}
           <Badge color={statusColors[trip.status]}>{trip.status}</Badge>
           {trip.status === TripStatus.STARTED && (
             <div className="flex items-center gap-1">
@@ -385,6 +410,7 @@ const TripCard: React.FC<{
                 <Icons.Map className="w-4 h-4" /> Track Now
               </button>
             ) : alreadyRequested ? (
+              /* Fix: Explicitly ensuring children are provided to the Badge component */
               <Badge color="slate">Requested</Badge>
             ) : trip.status === TripStatus.OPEN && !isRequesting && (
               <button 
@@ -407,6 +433,7 @@ const TripCard: React.FC<{
                 <Icons.Map className="w-4 h-4" /> Live Hub
               </button>
             ) : (
+              /* Fix: Explicitly ensuring children are provided to the Badge component */
               <Badge color="indigo">Your Trip</Badge>
             )}
             {trip.status === TripStatus.OPEN && (
@@ -425,7 +452,7 @@ const TripCard: React.FC<{
             <p className="text-[10px] font-[1000] text-indigo-600 uppercase mb-3 tracking-widest">Message to Host</p>
             <textarea 
               autoFocus
-              className="w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm text-slate-900 placeholder:text-slate-300 outline-none resize-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-black transition-all"
+              className="w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm text-slate-900 placeholder:text-slate-300 outline-none resize-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 font-black transition-all"
               rows={2}
               value={requestMessage}
               onChange={(e) => setRequestMessage(e.target.value)}
@@ -650,7 +677,7 @@ export default function App() {
               <div className="bg-indigo-600 p-4 rounded-[20px] shadow-[0_0_40px_rgba(79,70,229,0.8)] border-2 border-white/20">
                 <Icons.Car className="w-7 h-7 text-white" />
               </div>
-              <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white text-slate-900 px-4 py-1.5 rounded-full text-[10px] font-[1000] shadow-2xl uppercase tracking-widest border-2 border-indigo-500">
+              <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white text-slate-900 px-4 py-1.5 rounded-full text-[10px] font-[1000] shadow-2xl uppercase tracking-widest border-2 border-indigo-50">
                 {trip.ownerName}
               </div>
             </div>
@@ -682,6 +709,7 @@ export default function App() {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <h3 className="text-3xl font-[1000] tracking-tight text-white uppercase italic">Live Feed</h3>
+              {/* Fix: Explicitly ensuring children are provided to the Badge component */}
               <Badge color="green">Active</Badge>
             </div>
             <p className="text-slate-400 text-base font-black uppercase tracking-widest">{trip.from} <span className="text-indigo-500 mx-2">→</span> {trip.to}</p>
@@ -853,26 +881,48 @@ export default function App() {
       <div className="max-w-6xl mx-auto py-12 px-4 space-y-12 min-h-[85vh]">
         <div className="bg-white p-10 md:p-16 rounded-[64px] shadow-sm border border-slate-100 space-y-12">
           <h2 className="text-5xl font-[1000] text-slate-900 tracking-tight text-center md:text-left uppercase italic">Explore God's Own Routes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="space-y-4">
-              <label className="text-[11px] font-[1000] text-slate-400 uppercase tracking-[0.4em] ml-8">Origin Hub</label>
-              <LocationInput 
-                placeholder="E.g. Kakkanad or Technopark" 
-                icon={<Icons.Location className="w-6 h-6"/>}
-                value={searchQuery.from}
-                onChange={(val) => setSearchQuery(prev => ({ ...prev, from: val }))}
-              />
+          
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-4">
+                <label className="text-[11px] font-[1000] text-slate-400 uppercase tracking-[0.4em] ml-8">Origin Hub</label>
+                <LocationInput 
+                  placeholder="E.g. Kakkanad or Technopark" 
+                  icon={<Icons.Location className="w-6 h-6"/>}
+                  value={searchQuery.from}
+                  onChange={(val) => setSearchQuery(prev => ({ ...prev, from: val }))}
+                />
+              </div>
+              <div className="space-y-4">
+                <label className="text-[11px] font-[1000] text-slate-400 uppercase tracking-[0.4em] ml-8">Destination Hub</label>
+                <LocationInput 
+                  placeholder="E.g. Swaraj Round" 
+                  icon={<Icons.Location className="w-6 h-6"/>}
+                  value={searchQuery.to}
+                  onChange={(val) => setSearchQuery(prev => ({ ...prev, to: val }))}
+                />
+              </div>
             </div>
-            <div className="space-y-4">
-              <label className="text-[11px] font-[1000] text-slate-400 uppercase tracking-[0.4em] ml-8">Destination Hub</label>
-              <LocationInput 
-                placeholder="E.g. Swaraj Round" 
-                icon={<Icons.Location className="w-6 h-6"/>}
-                value={searchQuery.to}
-                onChange={(val) => setSearchQuery(prev => ({ ...prev, to: val }))}
-              />
-            </div>
+
+            {/* Quick Recommendation Chips */}
+            {!searchQuery.from && !searchQuery.to && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-700">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] ml-4 italic">Popular Commutes</p>
+                <div className="flex flex-wrap gap-3">
+                  {POPULAR_KERALA_ROUTES.map((route, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => setSearchQuery({ from: route.from, to: route.to })}
+                      className="bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 px-5 py-3 rounded-2xl text-[11px] font-black transition-all border border-indigo-100 flex items-center gap-2 active:scale-95"
+                    >
+                      <Icons.Map className="w-3 h-3"/> {route.from} → {route.to}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
           {searchQuery.from && searchQuery.to && (
             <button 
               onClick={async () => {
@@ -884,6 +934,7 @@ export default function App() {
               <Icons.Sparkles className="w-5 h-5" /> {advice.length > 0 ? 'Update Travel Intelligence' : 'Get Kerala Travel Advice'}
             </button>
           )}
+          
           {advice.length > 0 && (
             <div className="bg-indigo-50/50 p-10 rounded-[48px] border-2 border-indigo-100 flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-500">
               <div className="flex items-center gap-3 mb-2">
@@ -904,7 +955,9 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {filteredTrips.length === 0 ? (
-            <div className="col-span-full py-32 text-center opacity-30 italic text-slate-600 font-[1000] text-2xl uppercase tracking-[0.3em]">No bypass activity detected.</div>
+            <div className="col-span-full py-32 text-center opacity-30 italic text-slate-600 font-[1000] text-2xl uppercase tracking-[0.3em]">
+              No bypass activity detected for this route.
+            </div>
           ) : (
             filteredTrips.map(t => (
               <TripCard 
@@ -1059,6 +1112,7 @@ export default function App() {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-5">
+                    {/* Fix: Explicitly ensuring children are provided to the Badge component */}
                     <Badge color={t.status === TripStatus.STARTED ? 'green' : 'indigo'}>{t.status}</Badge>
                     <div className="flex gap-4">
                       {t.status === TripStatus.OPEN && (
@@ -1099,6 +1153,7 @@ export default function App() {
                               <button onClick={() => handleRequestAction(t.id, r.id, 'REJECT')} className="text-slate-400 text-[11px] font-black px-8 py-4 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all uppercase tracking-widest">Ignore</button>
                             </>
                           ) : (
+                            /* Fix: Explicitly ensuring children are provided to the Badge component */
                             <Badge color={r.status === RequestStatus.ACCEPTED ? 'green' : 'red'}>{r.status}</Badge>
                           )}
                         </div>
@@ -1130,6 +1185,7 @@ export default function App() {
                         <div className="flex items-center gap-3"><div className="bg-yellow-100 p-1.5 rounded-xl shadow-sm"><Icons.Star className="w-5 h-5 text-yellow-600"/></div><span className="text-[11px] font-[1000] text-yellow-700 uppercase tracking-[0.4em] italic">{t.ownerRating} SCORE</span></div>
                       </div>
                     </div>
+                    {/* Fix: Explicitly ensuring children are provided to the Badge component */}
                     <Badge color={myReq?.status === RequestStatus.ACCEPTED ? 'green' : 'slate'}>{myReq?.status}</Badge>
                   </div>
                   <div className="space-y-10">
