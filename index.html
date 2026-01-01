@@ -4,26 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PoolPal - Peer-to-Peer Pooling</title>
+    <title>Code Pooling - Community Mobility</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        :root {
+            --bg-deep: #0B1220;
+            --bg-surface: #111827;
+            --brand-teal: #2DD4BF;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: var(--bg-deep);
+            color: #E2E8F0;
         }
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
+        .leaflet-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            z-index: 1;
+            background: #0f172a;
         }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        /* Custom Marker pulse for live location */
+        .live-marker {
+            background: var(--brand-teal);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--brand-teal);
         }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+        @keyframes pulse-teal {
+          0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(45, 212, 191, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
         }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .animate-pulse-teal {
+          animation: pulse-teal 2s infinite;
         }
     </style>
 <script type="importmap">
@@ -39,7 +57,6 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Explicitly import the index module for production environment compatibility -->
     <script type="module" src="index.tsx"></script>
 </body>
 </html>

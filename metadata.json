@@ -1,6 +1,6 @@
 {
-  "name": "PoolPal - Community Mobility",
-  "description": "A peer-to-peer ride-sharing platform for cars and bikes, focusing on cost-sharing and reducing environmental impact through community pooling.",
+  "name": "CodePool - Kerala Community Mobility",
+  "description": "A community-focused pooling app for sharing rides and saving God's Own Country.",
   "requestFramePermissions": [
     "geolocation"
   ]
