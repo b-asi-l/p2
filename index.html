@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PoolPal - Community Mobility</title>
+    <title>RIDEva - Professional Community Mobility</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Leaflet Maps -->
@@ -12,46 +11,77 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
-            --bg-deep: #0B1220;
-            --bg-surface: #111827;
-            --brand-teal: #2DD4BF;
-            --brand-rose: #F43F5E;
+            /* Common Tokens */
+            --color-primary: #2563EB;
+            --color-primary-hover: #1D4ED8;
+            --color-secondary: #64748B;
+            --color-success: #10B981;
+            --color-error: #EF4444;
+            --radius-card: 24px;
+            --radius-button: 16px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Light Theme Palette */
+            --bg-app: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --bg-surface-alt: #F1F5F9;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(37, 99, 235, 0.1);
         }
+
+        [data-theme='dark'] {
+            /* Dark Theme Palette */
+            --bg-app: #0F172A;
+            --bg-surface: #1E293B;
+            --bg-surface-alt: #334155;
+            --text-main: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border-color: #334155;
+            --nav-bg: rgba(30, 41, 59, 0.8);
+            --shadow-sm: none;
+            --shadow-md: none;
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-deep);
-            color: #E2E8F0;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            transition: background-color var(--transition), color var(--transition);
         }
+
+        .card-shadow { box-shadow: var(--shadow-md); }
+        .border-base { border: 1px solid var(--border-color); }
+        
         .leaflet-container {
             width: 100%;
             height: 100%;
-            border-radius: 20px;
+            border-radius: var(--radius-card);
             z-index: 1;
-            background: #0f172a;
+            background: var(--bg-surface-alt);
         }
+
         /* Custom Marker pulse for live location */
         .live-marker {
-            background: var(--brand-teal);
+            background: var(--color-primary);
             border: 3px solid white;
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--brand-teal);
+            box-shadow: 0 0 15px var(--color-primary);
         }
-        @keyframes pulse-teal {
-          0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7); }
-          70% { box-shadow: 0 0 0 15px rgba(45, 212, 191, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+        @keyframes pulse-primary {
+          0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
         }
-        @keyframes pulse-rose {
-          0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
-          70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        .animate-pulse-primary {
+          animation: pulse-primary 2s infinite;
         }
-        .animate-pulse-teal {
-          animation: pulse-teal 2s infinite;
-        }
-        .animate-pulse-rose {
-          animation: pulse-rose 2s infinite;
-        }
+
         /* Custom scrollbars */
         .custom-scroll::-webkit-scrollbar {
           width: 4px;
@@ -60,9 +90,19 @@
           background: transparent;
         }
         .custom-scroll::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.05);
+          background: var(--border-color);
           border-radius: 10px;
         }
+
+        /* Theme-aware utilities */
+        .bg-app { background-color: var(--bg-app); }
+        .bg-surface { background-color: var(--bg-surface); }
+        .bg-surface-alt { background-color: var(--bg-surface-alt); }
+        .text-main { color: var(--text-main); }
+        .text-muted { color: var(--text-muted); }
+        .border-subtle { border-color: var(--border-color); }
+        .primary-btn { background-color: var(--color-primary); color: white; }
+        .primary-btn:hover { background-color: var(--color-primary-dark); }
     </style>
 <script type="importmap">
 {
@@ -76,7 +116,7 @@
 }
 </script>
 </head>
-<body>
+<body data-theme="light">
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
 </body>

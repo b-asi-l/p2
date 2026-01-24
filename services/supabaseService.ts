@@ -23,22 +23,6 @@ export const authService = {
     return { data, error };
   },
 
-  async signInWithPhone(phone: string) {
-    const { data, error } = await supabase.auth.signInWithOtp({
-      phone: phone,
-    });
-    return { data, error };
-  },
-
-  async verifyPhoneOtp(phone: string, token: string) {
-    const { data, error } = await supabase.auth.verifyOtp({
-      phone,
-      token,
-      type: 'sms',
-    });
-    return { data, error };
-  },
-
   async signOut() {
     return await supabase.auth.signOut();
   },
@@ -63,5 +47,45 @@ export const tripService = {
       .insert([tripData])
       .select();
     return { data, error };
+  }
+};
+
+export const kycService = {
+  async uploadFile(userId: string, file: File, category: string, bucket: string = 'kyc-driver') {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}/${category}_${Date.now()}.${fileExt}`;
+
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file);
+
+    if (error) throw error;
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  },
+
+  async submitDriverKYC(kycData: any) {
+    const { data, error } = await supabase
+      .from('driver_kyc')
+      .insert([kycData])
+      .select();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async submitCustomerKYC(kycData: any) {
+    const { data, error } = await supabase
+      .from('customer_kyc')
+      .insert([kycData])
+      .select();
+    
+    if (error) throw error;
+    return data;
   }
 };

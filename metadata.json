@@ -1,5 +1,5 @@
 {
-  "name": "PoolPal - Kerala Community Mobility",
+  "name": "RIDEva - Kerala Community Mobility",
   "description": "A community-focused pooling app for sharing rides and saving God's Own Country.",
   "requestFramePermissions": [
     "geolocation"
