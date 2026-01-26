@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Icons } from '../constants';
-import { kycService } from '../services/supabaseService';
+import { kycService } from '../services/firebaseService';
 import { User } from '../types';
 
 interface CustomerKYCProps {
@@ -223,4 +223,3 @@ export const CustomerKYC: React.FC<CustomerKYCProps> = ({ user, onBack, onSucces
     </div>
   );
 };
-    

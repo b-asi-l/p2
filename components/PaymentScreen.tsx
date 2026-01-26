@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Icons } from '../constants';
 import { Trip, User, Booking } from '../types';
-import { savePaymentToFirebase } from '../services/firebaseService';
+import { savePayment } from '../services/firebaseService';
 
 interface PaymentScreenProps {
   trip: Trip;
@@ -36,17 +36,22 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({ trip, user, onPaym
       from: trip.from,
       to: trip.to,
       ownerName: trip.ownerName,
+      ownerPhone: trip.ownerPhone,
+      ownerAvatar: trip.ownerAvatar,
       message: bookingMessage
     };
 
-    await savePaymentToFirebase(booking);
+    const success = await savePayment(booking);
 
     setProcessing(false);
-    setShowSuccess(true);
-    
-    setTimeout(() => {
-      onPaymentSuccess(booking);
-    }, 1500);
+    if (success) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          onPaymentSuccess(booking);
+        }, 1500);
+    } else {
+        alert("Payment failed. Please try again.");
+    }
   };
 
   if (showSuccess) {

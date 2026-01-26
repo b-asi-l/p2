@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,38 +12,40 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
-            /* Common Tokens */
-            --color-primary: #2563EB;
-            --color-primary-hover: #1D4ED8;
+            /* Branding Colors from Logo */
+            --color-primary: #16A34A; /* Forest Green */
+            --color-primary-hover: #15803D;
+            --color-accent: #EA580C; /* Sunrise Orange */
+            --color-accent-hover: #C2410C;
             --color-secondary: #64748B;
-            --color-success: #10B981;
+            --color-success: #16A34A;
             --color-error: #EF4444;
             --radius-card: 24px;
             --radius-button: 16px;
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
             /* Light Theme Palette */
-            --bg-app: #F8FAFC;
+            --bg-app: #F8FAF9;
             --bg-surface: #FFFFFF;
-            --bg-surface-alt: #F1F5F9;
-            --text-main: #0F172A;
+            --bg-surface-alt: #F0FDF4;
+            --text-main: #064E3B;
             --text-muted: #64748B;
-            --border-color: #E2E8F0;
-            --nav-bg: rgba(255, 255, 255, 0.8);
+            --border-color: #DCFCE7;
+            --nav-bg: rgba(255, 255, 255, 0.85);
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px rgba(37, 99, 235, 0.1);
+            --shadow-md: 0 4px 12px rgba(22, 163, 74, 0.05);
+            --shadow-lg: 0 10px 25px rgba(22, 163, 74, 0.1);
         }
 
         [data-theme='dark'] {
             /* Dark Theme Palette */
-            --bg-app: #0F172A;
-            --bg-surface: #1E293B;
-            --bg-surface-alt: #334155;
-            --text-main: #F1F5F9;
-            --text-muted: #94A3B8;
-            --border-color: #334155;
-            --nav-bg: rgba(30, 41, 59, 0.8);
+            --bg-app: #064E3B;
+            --bg-surface: #065F46;
+            --bg-surface-alt: #047857;
+            --text-main: #F0FDF4;
+            --text-muted: #D1FAE5;
+            --border-color: #065F46;
+            --nav-bg: rgba(6, 78, 59, 0.85);
             --shadow-sm: none;
             --shadow-md: none;
             --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.3);
@@ -74,9 +77,9 @@
             box-shadow: 0 0 15px var(--color-primary);
         }
         @keyframes pulse-primary {
-          0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
-          70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+          0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(22, 163, 74, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
         }
         .animate-pulse-primary {
           animation: pulse-primary 2s infinite;
@@ -102,7 +105,6 @@
         .text-muted { color: var(--text-muted); }
         .border-subtle { border-color: var(--border-color); }
         .primary-btn { background-color: var(--color-primary); color: white; }
-        .primary-btn:hover { background-color: var(--color-primary-dark); }
     </style>
 <script type="importmap">
 {
@@ -111,7 +113,12 @@
     "react": "https://esm.sh/react@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.48.1"
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+    "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js",
+    "firebase/": "https://esm.sh/firebase@^12.8.0/",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.91.1"
   }
 }
 </script>

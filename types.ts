@@ -24,9 +24,9 @@ export interface LiveLocation {
   lat: number;
   lng: number;
   timestamp: number;
-  accuracy?: number; // Accuracy in meters
-  heading?: number | null; // Direction in degrees
-  speed?: number | null; // Speed in m/s
+  accuracy?: number;
+  heading?: number | null;
+  speed?: number | null;
 }
 
 export interface JoinRequest {
@@ -36,7 +36,7 @@ export interface JoinRequest {
   userAvatar: string;
   message: string;
   status: RequestStatus;
-  userLocation?: LiveLocation; // Added for live tracking
+  userLocation?: LiveLocation;
 }
 
 export interface User {
@@ -54,7 +54,7 @@ export interface User {
   licenseNumber?: string;
   vehicleRC?: string;
   insurancePolicy?: string;
-  currentLocation?: LiveLocation; // Added for live tracking
+  currentLocation?: LiveLocation;
 }
 
 export interface Trip {
@@ -63,6 +63,7 @@ export interface Trip {
   ownerName: string;
   ownerAvatar: string;
   ownerRating: number;
+  ownerPhone?: string;
   ownerTripsCount?: number;
   ownerUpiId?: string;
   from: string;
@@ -76,7 +77,7 @@ export interface Trip {
   status: TripStatus;
   description?: string;
   requests: JoinRequest[];
-  driverLocation?: LiveLocation; // Added for live tracking
+  driverLocation?: LiveLocation;
 }
 
 export interface Booking {
@@ -92,6 +93,8 @@ export interface Booking {
   from: string;
   to: string;
   ownerName: string;
+  ownerPhone?: string;
+  ownerAvatar?: string;
   message?: string;
 }
 
@@ -103,10 +106,10 @@ export type ViewState =
   | 'POST' 
   | 'ACTIVITY' 
   | 'PROFILE' 
-  | 'ONBOARDING_PROFILE'
-  | 'PAYMENT'
-  | 'RECEIPT'
-  | 'ID_VERIFY'
-  | 'DRIVER_DOCS'
-  | 'LIVE_TRACKING'
-  | 'CUSTOMER_KYC';
+  | 'PAYMENT' 
+  | 'RECEIPT' 
+  | 'LIVE_TRACKING' 
+  | 'CUSTOMER_KYC'
+  | 'DRIVER_KYC'
+  | 'ADMIN_PANEL'
+  | 'CHAT';
